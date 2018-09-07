@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
 using System.Threading.Tasks;
 using ContosoUniversity.Models;
@@ -21,14 +22,36 @@ namespace ContosoUniversity.Pages
 
         public async Task OnGetAsync()
         {
-            var data = from student in _context.Student
-                       group student by student.EnrollmentDate into dateGroup
-                       select new EnrollmentDateGroup()
-                       {
-                           EnrollmentDate = dateGroup.Key,
-                           StudentCount = dateGroup.Count()
-                       };
-            Students = await data.AsNoTracking().ToListAsync();
+            List<EnrollmentDateGroup> groups = new List<EnrollmentDateGroup>();
+            var connect = _context.Database.GetDbConnection();
+            try
+            {
+                await connect.OpenAsync();
+                using (var command = connect.CreateCommand())
+                {
+                    var query = "select EnrollmentDate, COUNT(*) as StudentCount "
+                              + "FROM Person "
+                              + "WHERE Discriminator = 'Student' "
+                              + "GROUP BY EnrollmentDate";
+                    command.CommandText = query;
+                    using (DbDataReader reader = await command.ExecuteReaderAsync())
+                    {
+                        if (reader.HasRows)
+                        {
+                            while (await reader.ReadAsync())
+                            {
+                                var row = new EnrollmentDateGroup { EnrollmentDate = reader.GetDateTime(0), StudentCount = reader.GetInt32(1) };
+                                groups.Add(row);
+                            }
+                        }
+                    }
+                }
+            }
+            finally
+            {
+                connect.Close();
+            }
+            Students = groups;
         }
     }
 }

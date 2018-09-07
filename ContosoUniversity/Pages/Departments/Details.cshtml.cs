@@ -27,8 +27,13 @@ namespace ContosoUniversity.Pages.Departments
                 return NotFound();
             }
 
+            var query = "select * from Department where DepartmentID = {0}";
+
             Department = await _context.Departments
-                .Include(d => d.Administrator).FirstOrDefaultAsync(m => m.DepartmentID == id);
+                .FromSql(query, id)
+                .Include(d => d.Administrator)
+                .AsNoTracking()
+                .SingleOrDefaultAsync();
 
             if (Department == null)
             {

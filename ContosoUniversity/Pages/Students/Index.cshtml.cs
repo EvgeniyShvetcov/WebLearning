@@ -28,8 +28,8 @@ namespace ContosoUniversity.Pages.Students
         public async Task OnGetAsync(string sortOrder, 
            string searchString, int? pageIndex)
         {
-            NameSort = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
-            DateSort = sortOrder == "Date" ? "date_desc" : "Date";
+            NameSort = String.IsNullOrEmpty(sortOrder) ? "LastName_desc" : "";
+            DateSort = sortOrder == "EntollmentDate" ? "EnrollmentDate_desc" : "EnrollmentDate";
 
             if(searchString != null)
             {
@@ -47,7 +47,27 @@ namespace ContosoUniversity.Pages.Students
                 studentsQuery  = studentsQuery.Where(s => s.LastName.Contains(searchString) 
                                                     || s.FirstMidName.Contains(searchString));
             }
-            switch (sortOrder)
+
+            if(string.IsNullOrEmpty(sortOrder))
+            {
+                sortOrder = "LastName";
+            }
+            var descending = false;
+            if(sortOrder.EndsWith("_desc"))
+            {
+                sortOrder = sortOrder.Substring(0, sortOrder.Length - 5);
+                descending = true;
+            }
+            if(descending)
+            {
+                studentsQuery = studentsQuery.OrderByDescending(e => EF.Property<string>(e, sortOrder));
+            }
+            else
+            {
+                studentsQuery = studentsQuery.OrderBy(e => EF.Property<string>(e, sortOrder));
+            }
+
+            /*switch (sortOrder)
             {
                 case "name_desc":
                     studentsQuery = studentsQuery.OrderByDescending(s => s.LastName);
@@ -61,7 +81,8 @@ namespace ContosoUniversity.Pages.Students
                 default:
                     studentsQuery = studentsQuery.OrderBy(s => s.LastName);
                     break;
-            }
+            }*/
+
             int pageSize = 3;
 
             Student = await PaginatedList<Student>.CreateAsync(studentsQuery.AsNoTracking(), pageIndex ?? 1, pageSize);

@@ -31,7 +31,7 @@ namespace ContosoUniversity.Pages.Students
                             .Include(s => s.Enrollments)
                                 .ThenInclude(e => e.Course)
                             .AsNoTracking()
-                            .FirstOrDefaultAsync(m => m.StudentID == id);
+                            .FirstOrDefaultAsync(m => m.ID == id);
 
             if (Student == null)
             {

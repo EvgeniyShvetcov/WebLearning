@@ -7,8 +7,6 @@ namespace ContosoUniversity.Models
 {
     public class Student : Person
     {
-        public int StudentID { get; set; } //Similarly 'ID'
-
         [DataType(DataType.Date)]
         [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
         [Display(Name = "Enrollment Date")]
