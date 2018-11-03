@@ -9,10 +9,10 @@ export class NavMenu extends Component {
 
   render() {
     return (
-      <Navbar inverse fixedTop fluid collapseOnSelect>
+        <Navbar inverse fluid collapseOnSelect>
         <Navbar.Header>
           <Navbar.Brand>
-            <Link to={'/'}>Test</Link>
+            <Link to={'/'}>ReactChatApp</Link>
           </Navbar.Brand>
           <Navbar.Toggle />
         </Navbar.Header>
