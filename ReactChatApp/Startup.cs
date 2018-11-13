@@ -27,6 +27,9 @@ namespace ReactChatApp
             {
                 configuration.RootPath = "ClientApp/build";
             });
+
+            services.AddSignalR();
+            //services.AddSingleton<IChatService, ChatService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

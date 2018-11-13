@@ -1,22 +1,28 @@
 import React, { PropTypes } from 'react';
 import { Panel } from 'react-bootstrap';
+import UsersServices from '../../services/UsersService';
 
 export class Users extends React.Component {
     constructor(props) {
         super(props);
 
         this.state = {
-            users: [
-                { id: 1, name: "juergen" },
-                { id: 2, name: "marion" },
-                { id: 3, name: "peter" },
-                { id: 4, name: "mo" },
-            ]
+            users: []
         };
+        this.setUsersList = this.setUsersList.bind(this);
+
+        this.usersService = new UsersServices();
+        this.usersService.fetchOnlineUsersList(this.setUsersList);
+    }
+
+    setUsersList(usersList){
+        this.setState({
+            users: usersList
+        })
     }
 
     render() {
-        const users = this.state.users.map((user) => {
+        const users = this.state.users.length === 0 ? <p>Loading...</p>: this.state.users.map((user) => {
             return <li key={user.id}>{user.name}</li>
         })
         return (

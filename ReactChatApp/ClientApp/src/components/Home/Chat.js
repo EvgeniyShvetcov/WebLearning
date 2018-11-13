@@ -1,6 +1,7 @@
 import React from 'react';
 import { Panel, Form, InputGroup, Button} from 'react-bootstrap';
 import moment from 'moment';
+import ChatService from '../../services/ChatService';
 
 export class Chat extends React.Component {
     constructor(props) {
@@ -14,6 +15,14 @@ export class Chat extends React.Component {
         this.handleMessageChange = this.handleMessageChange.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
         this.addMessage = this.addMessage.bind(this);
+        this.setMessagesList = this.setMessagesList.bind(this);
+
+        this.chatService = new ChatService();
+        this.chatService.fetchMessagesList(this.setMessagesList);
+    }
+
+    componentDidMount(){
+        this.msg.focus();
     }
 
     handlePanelRef(div) {
@@ -47,7 +56,7 @@ export class Chat extends React.Component {
             id,
             date,
             message: currentMessage,
-            sender: 'jurgen'
+            sender: 'Jurgen'
         });
         this.setState({
             messages: messages,
@@ -57,8 +66,14 @@ export class Chat extends React.Component {
         this.panel.scrollTop = this.panel.scrollHeight - this.panel.clientHeight;
     }
 
+    setMessagesList(messagesList){
+        this.setState({
+            messages : messagesList
+        });
+    }
+
     render() {
-        const messages =this.state.messages.map((message) => {
+        const messages = this.state.messages.length === 0 ? <p>Loading...</p> : this.state.messages.map((message) => {
             return (
                 <li key={message.id}>
                     <strong>{message.sender} </strong>
