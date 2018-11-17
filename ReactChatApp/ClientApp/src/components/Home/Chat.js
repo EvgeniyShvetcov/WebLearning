@@ -15,14 +15,21 @@ export class Chat extends React.Component {
         this.handleMessageChange = this.handleMessageChange.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
         this.addMessage = this.addMessage.bind(this);
+        
         this.setMessagesList = this.setMessagesList.bind(this);
-
-        this.chatService = new ChatService();
+        this.chatService = new ChatService(this.addMessage);
         this.chatService.fetchMessagesList(this.setMessagesList);
+
+        this.focusField = () => {
+            if(this.msg) this.msg.focus();
+        }
+        this.scrollDown = () => {
+            if(this.panel) this.panel.scrollTop = this.panel.scrollHeight;
+        }
     }
 
     componentDidMount(){
-        this.msg.focus();
+        this.focusField();
     }
 
     handlePanelRef(div) {
@@ -40,36 +47,30 @@ export class Chat extends React.Component {
 
     onSubmit(event){
         event.preventDefault();
-        this.addMessage();
+        this.chatService.sendMessage(this.state.currentMessage);
     }
 
-    addMessage(){
-        let currentMessage = this.state.currentMessage;
-        if(currentMessage.length === 0){
+    addMessage(newMessage){
+        if(newMessage.length === 0){
             return;
         }
-        let id = this.state.messages.length;
-        let date = new Date();
-
         let messages = this.state.messages;
-        messages.push({
-            id,
-            date,
-            message: currentMessage,
-            sender: 'Jurgen'
-        });
+
+        messages.push(newMessage);
         this.setState({
             messages: messages,
             currentMessage: ''
         });
-        this.msg.focus();
-        this.panel.scrollTop = this.panel.scrollHeight - this.panel.clientHeight;
+        this.focusField();
+        this.scrollDown();
     }
 
     setMessagesList(messagesList){
         this.setState({
             messages : messagesList
         });
+
+        this.scrollDown();
     }
 
     render() {

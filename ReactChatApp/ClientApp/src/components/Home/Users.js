@@ -10,9 +10,18 @@ export class Users extends React.Component {
             users: []
         };
         this.setUsersList = this.setUsersList.bind(this);
+        this.onUserLoginOn = this.onUserLoginOn.bind(this);
 
-        this.usersService = new UsersServices();
+        this.usersService = new UsersServices(this.onUserLoginOn);
         this.usersService.fetchOnlineUsersList(this.setUsersList);
+    }
+
+    onUserLoginOn(id, name){
+        const users = this.state.users;
+        users.push({id, name});
+        this.setState({
+            users: users
+        });
     }
 
     setUsersList(usersList){

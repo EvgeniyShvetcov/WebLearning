@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using ReactChatApp.Hubs;
+using ReactChatApp.Services;
 
 namespace ReactChatApp
 {
@@ -29,7 +31,7 @@ namespace ReactChatApp
             });
 
             services.AddSignalR();
-            //services.AddSingleton<IChatService, ChatService>();
+            services.AddSingleton<IChatService, ChatService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -49,6 +51,11 @@ namespace ReactChatApp
             app.UseStaticFiles();
             app.UseSpaStaticFiles();
 
+            app.UseSignalR(routes => 
+            {
+                routes.MapHub<ChatHub>("/chat");
+            });
+
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
@@ -65,6 +72,8 @@ namespace ReactChatApp
                     spa.UseReactDevelopmentServer(npmScript: "start");
                 }
             });
+
+
         }
     }
 }
