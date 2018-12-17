@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import './App.css';
+import { Page } from '../components/Page';
+import { User } from '../components/User';
 
 class App extends Component {
 	render() {
@@ -10,10 +12,8 @@ class App extends Component {
 				<header className="App-header">
 					<h1 className="App-title">Мой топ фото</h1>
 				</header>
-				<p>Привет, {user.name}!</p>
-				<p>
-					У тебя {page.photos.length} фото за {page.year} год.
-				</p>
+				<User {...user} />
+				<Page {...page} />
 			</div>
 		);
 	}
