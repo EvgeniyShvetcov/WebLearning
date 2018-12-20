@@ -3,17 +3,16 @@ import { connect } from 'react-redux';
 import './App.css';
 import { Page } from '../components/Page';
 import { User } from '../components/User';
+import { getPhotos } from '../actions/PageActions';
+import { handleLogin } from '../actions/UserActions';
 
 class App extends Component {
 	render() {
-		const { user, page } = this.props;
+		const { user, page, getPhotosAction, handleLoginAction } = this.props;
 		return (
-			<div className="App">
-				<header className="App-header">
-					<h1 className="App-title">Мой топ фото</h1>
-				</header>
-				<User {...user} />
-				<Page {...page} />
+			<div className="app">
+				<Page getPhotos={getPhotosAction} {...page} />
+				<User handleLogin={handleLoginAction} {...user} />
 			</div>
 		);
 	}
@@ -21,11 +20,21 @@ class App extends Component {
 
 //Mapping reducers state to React component props
 const mapToStateProps = store => {
-	console.log(store);
 	return {
 		user: store.user,
 		page: store.page,
 	};
 };
 
-export default connect(mapToStateProps)(App);
+//Mapping actions to React component props
+const mapDispatchToProps = dispatch => {
+	return {
+		getPhotosAction: year => dispatch(getPhotos(year)),
+		handleLoginAction: () => dispatch(handleLogin()),
+	};
+};
+
+export default connect(
+	mapToStateProps,
+	mapDispatchToProps
+)(App);
