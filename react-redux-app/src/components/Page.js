@@ -6,25 +6,21 @@ export const Page = ({ year, photos, isFetching, getPhotos }) => {
 		const year = +event.currentTarget.innerText;
 		getPhotos(year);
 	};
+
+	const renderButtons = () => {
+		const years = [2018, 2017, 2016, 2015, 2014];
+		return years.map((item, index) => {
+			return (
+				<button key={index} className="btn" onClick={onButtonClick}>
+					{item}
+				</button>
+			);
+		});
+	};
+
 	return (
 		<div className="ib page">
-			<React.Fragment>
-				<button className="btn" onClick={onButtonClick}>
-					2018
-				</button>{' '}
-				<button className="btn" onClick={onButtonClick}>
-					2017
-				</button>{' '}
-				<button className="btn" onClick={onButtonClick}>
-					2016
-				</button>{' '}
-				<button className="btn" onClick={onButtonClick}>
-					2015
-				</button>{' '}
-				<button className="btn" onClick={onButtonClick}>
-					2014
-				</button>
-			</React.Fragment>
+			<React.Fragment>{renderButtons()}</React.Fragment>
 			{isFetching ? (
 				<p>Загрузка...</p>
 			) : (

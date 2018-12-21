@@ -21,6 +21,7 @@ export const User = ({ name, isFetching, error, handleLogin }) => {
 			);
 		}
 	};
+	console.log('<User/> render');
 	return <div className="ib user">{renderTemplate()}</div>;
 };
 
