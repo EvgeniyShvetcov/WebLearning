@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-export const Page = ({ year, photos, isFetching, getPhotos }) => {
+export const Page = ({ year, photos, isFetching, error, getPhotos }) => {
 	const onButtonClick = event => {
 		const year = +event.currentTarget.innerText;
 		getPhotos(year);
@@ -17,7 +17,24 @@ export const Page = ({ year, photos, isFetching, getPhotos }) => {
 			);
 		});
 	};
-
+	const renderImages = () => {
+		if (error) {
+			return <p>Во время загрузки фотографий произошла ошибка</p>;
+		}
+		if (isFetching) {
+			return <p>Загрузка...</p>;
+		} else {
+			const photosList = photos.map(item => (
+				<div key={item.id} className="photo">
+					<p>
+						<img src={item.sizes[1].url} alt="..." />
+					</p>
+					<p>{item.likes.count}❤</p>
+				</div>
+			));
+			return <div className="photos">{photosList}</div>;
+		}
+	};
 	return (
 		<div className="ib page">
 			<React.Fragment>{renderButtons()}</React.Fragment>
@@ -25,8 +42,10 @@ export const Page = ({ year, photos, isFetching, getPhotos }) => {
 				<p>Загрузка...</p>
 			) : (
 				<React.Fragment>
-					<h3>{year} год</h3>
-					<p>У тебя {photos.length} фото</p>
+					<h3>
+						{year} год [{photos.length}]
+					</h3>
+					{renderImages()}
 				</React.Fragment>
 			)}
 		</div>

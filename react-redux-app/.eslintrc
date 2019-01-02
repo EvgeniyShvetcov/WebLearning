@@ -1,4 +1,7 @@
 {
+    "globals": {
+        "VK" : true
+    },
     "extends": [
         "react-app",
         "prettier"

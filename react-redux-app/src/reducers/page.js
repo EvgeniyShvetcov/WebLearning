@@ -8,16 +8,17 @@ const initialState = {
 	year: 2018,
 	photos: [],
 	isFetching: false,
+	error: '',
 };
 
 export function pageReducer(state = initialState, action) {
 	switch (action.type) {
 		case GET_PHOTOS_REQUEST:
-			return { ...state, year: action.payload, isFetching: true };
+			return { ...state, year: action.payload, isFetching: true, error: '' };
 		case GET_PHOTOS_SUCCESS:
-			return { ...state, photos: action.payload, isFetching: false };
+			return { ...state, photos: action.payload, isFetching: false, error: '' };
 		case GET_PHOTOS_FAIL:
-			return { ...state, isFetching: false };
+			return { ...state, isFetching: false, error: action.payload };
 		default:
 			return state;
 	}
