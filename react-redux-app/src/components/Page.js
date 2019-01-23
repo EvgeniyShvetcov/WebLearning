@@ -1,14 +1,22 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { getLastYears, LAST_FIVE_YEARS } from '../utils/DateHelper';
 
-export const Page = ({ year, photos, isFetching, error, getPhotos }) => {
+export const Page = ({
+	year,
+	photos,
+	isFetching,
+	isAuthorized,
+	error,
+	getPhotos,
+}) => {
 	const onButtonClick = event => {
 		const year = +event.currentTarget.innerText;
 		getPhotos(year);
 	};
 
 	const renderButtons = () => {
-		const years = [2018, 2017, 2016, 2015, 2014];
+		const years = getLastYears(LAST_FIVE_YEARS);
 		return years.map((item, index) => {
 			return (
 				<button key={index} className="btn" onClick={onButtonClick}>
@@ -26,10 +34,8 @@ export const Page = ({ year, photos, isFetching, error, getPhotos }) => {
 		} else {
 			const photosList = photos.map(item => (
 				<div key={item.id} className="photo">
-					<p>
-						<img src={item.sizes[1].url} alt="..." />
-					</p>
-					<p>{item.likes.count}❤</p>
+					<img src={item.sizes[2].url} alt="..." />
+					<div>{item.likes.count}❤</div>
 				</div>
 			));
 			return <div className="photos">{photosList}</div>;
@@ -37,11 +43,9 @@ export const Page = ({ year, photos, isFetching, error, getPhotos }) => {
 	};
 	return (
 		<div className="ib page">
-			<React.Fragment>{renderButtons()}</React.Fragment>
-			{isFetching ? (
-				<p>Загрузка...</p>
-			) : (
+			{isAuthorized && (
 				<React.Fragment>
+					{renderButtons()}
 					<h3>
 						{year} год [{photos.length}]
 					</h3>
@@ -57,4 +61,5 @@ Page.propTypes = {
 	photos: PropTypes.array.isRequired,
 	getPhotos: PropTypes.func.isRequired,
 	isFetching: PropTypes.bool.isRequired,
+	isAuthorized: PropTypes.bool.isRequired,
 };

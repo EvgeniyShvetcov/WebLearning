@@ -1,10 +1,16 @@
 import React from 'react';
 import { User } from '../components/User';
-import { handleLogin } from '../actions/UserActions';
+import { handleLogin, handleLogout } from '../actions/UserActions';
 import { connect } from 'react-redux';
 
-const UserContainer = ({ user, handleLoginAction }) => {
-	return <User {...user} handleLogin={handleLoginAction} />;
+const UserContainer = ({ user, handleLoginAction, handleLogoutAction }) => {
+	return (
+		<User
+			{...user}
+			handleLogin={handleLoginAction}
+			handleLogout={handleLogoutAction}
+		/>
+	);
 };
 
 //Mapping reducers state to React component props
@@ -18,6 +24,7 @@ const mapStateToProps = store => {
 const mapDispatchToProps = dispatch => {
 	return {
 		handleLoginAction: () => dispatch(handleLogin()),
+		handleLogoutAction: () => dispatch(handleLogout()),
 	};
 };
 

@@ -2,6 +2,7 @@ import {
 	LOGIN_REQUEST,
 	LOGIN_SUCCESS,
 	LOGIN_FAIL,
+	LOGOUT,
 } from '../actions/UserActions';
 
 const initialState = {
@@ -18,6 +19,8 @@ export function userReducer(state = initialState, action) {
 			return { ...state, isFetching: false, name: action.payload };
 		case LOGIN_FAIL:
 			return { ...state, isFetching: false, error: action.payload.message };
+		case LOGOUT:
+			return { ...state, name: '' };
 		default:
 			return state;
 	}
