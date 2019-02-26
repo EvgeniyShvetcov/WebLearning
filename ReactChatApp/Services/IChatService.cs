@@ -1,11 +1,12 @@
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using ReactChatApp.Models;
 
 namespace ReactChatApp.Services
 {
     public interface IChatService
     {
-        ICollection<ChatMessage> GetAllInitially();
+        Task<IEnumerable<ChatMessage>> GetAllInitially();
         ChatMessage CreateNewMessage(string senderName, string message);
         bool AddNewMessage(ChatMessage message);
     }

@@ -1,17 +1,20 @@
-import WebsocketService from './WebsocketService';
 export default class ChatService {
+	constructor(websocketService, onMessageRecieve) {
+		if (websocketService !== null && websocketService.isConnected) {
+			this._websocketService = websocketService;
+			this._websocketService.registerMessageAdded(onMessageRecieve);
+		}
+	}
 
-    constructor(onMessageRecieve){
-        WebsocketService.registerMessageAdded(onMessageRecieve);
-    }
+	sendMessage(message) {
+		if (this._websocketService) this._websocketService.sendMessage(message);
+	}
 
-    sendMessage(message){
-        WebsocketService.sendMessage(message);
-    }
-
-    fetchMessagesList(setMessagesList) {
-        fetch("api/Chat/InitialMessages")
-            .then(response => response.json())
-            .then(data => setMessagesList(data));
-    }
+	fetchMessagesList(setMessagesList) {
+		fetch('http://localhost:5000/api/Chat/InitialMessages')
+			.then(response => {
+				if (response.ok) return response.json();
+			})
+			.then(data => setMessagesList(data));
+	}
 }

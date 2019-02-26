@@ -1,113 +1,81 @@
 import React from 'react';
-import { Panel, Form, InputGroup, Button} from 'react-bootstrap';
+import { Panel } from 'react-bootstrap';
 import moment from 'moment';
 import ChatService from '../../services/ChatService';
+import WebsocketService from '../../services/WebsocketService';
+import InputField from './InputField';
+import './Chat.css';
 
 export class Chat extends React.Component {
-    constructor(props) {
-        super(props)
-        this.state = {
-            messages: [],
-            currentMessage: ''
-        }
-        this.handlePanelRef = this.handlePanelRef.bind(this);
-        this.handleMessageRef = this.handleMessageRef.bind(this);
-        this.handleMessageChange = this.handleMessageChange.bind(this);
-        this.onSubmit = this.onSubmit.bind(this);
-        this.addMessage = this.addMessage.bind(this);
-        
-        this.setMessagesList = this.setMessagesList.bind(this);
-        this.chatService = new ChatService(this.addMessage);
-        this.chatService.fetchMessagesList(this.setMessagesList);
+	constructor(props) {
+		super(props);
+		this.state = {
+			messages: [],
+		};
+		this.addMessage = this.addMessage.bind(this);
 
-        this.focusField = () => {
-            if(this.msg) this.msg.focus();
-        }
-        this.scrollDown = () => {
-            if(this.panel) this.panel.scrollTop = this.panel.scrollHeight;
-        }
-    }
+		this.setMessagesList = this.setMessagesList.bind(this);
+		this.chatService = new ChatService(
+			WebsocketService.instance,
+			this.addMessage
+		);
 
-    componentDidMount(){
-        this.focusField();
-    }
+		this.panel = React.createRef();
 
-    handlePanelRef(div) {
-        this.panel = div;
-    }
-    handleMessageRef(input) {
-        this.msg = input;
-    }
+		this.scrollDown = () => {
+			if (this.panel.current)
+				this.panel.current.scrollTop = this.panel.current.scrollHeight;
+		};
+	}
 
-    handleMessageChange(event){
-        this.setState({
-            currentMessage: event.target.value
-        });
-    }
+	componentDidMount() {
+		this.chatService.fetchMessagesList(this.setMessagesList);
+	}
 
-    onSubmit(event){
-        event.preventDefault();
-        this.chatService.sendMessage(this.state.currentMessage);
-    }
+	addMessage(newMessage) {
+		if (newMessage.length === 0) {
+			return;
+		}
+		this.setState({
+			messages: [...this.state.messages, newMessage],
+		});
+		this.scrollDown();
+	}
 
-    addMessage(newMessage){
-        if(newMessage.length === 0){
-            return;
-        }
-        let messages = this.state.messages;
+	setMessagesList(messagesList) {
+		this.setState({
+			messages: messagesList,
+		});
 
-        messages.push(newMessage);
-        this.setState({
-            messages: messages,
-            currentMessage: ''
-        });
-        this.focusField();
-        this.scrollDown();
-    }
+		this.scrollDown();
+	}
 
-    setMessagesList(messagesList){
-        this.setState({
-            messages : messagesList
-        });
-
-        this.scrollDown();
-    }
-
-    render() {
-        const messages = this.state.messages.length === 0 ? <p>Loading...</p> : this.state.messages.map((message) => {
-            return (
-                <li key={message.id}>
-                    <strong>{message.sender} </strong>
-                    ({moment(message.date).format('HH:mm:ss')})<br />
-                    {message.message}
-                </li>
-            );
-        })
-        return (
-            <Panel>
-                <Panel.Body className="panel-chat" ref={this.handlePanelRef}>
-                    <ul>
-                        {messages}
-                    </ul>
-                </Panel.Body>
-                <Panel.Footer>
-                    <Form onSubmit={this.onSubmit}>
-                        <label className='sr-only' htmlFor='msg'>Message</label>
-                        <InputGroup className='col-md-12'>
-                            <InputGroup.Button>
-                                <Button className='chat-button'>:-)</Button>
-                            </InputGroup.Button>
-                            <input type='text' value={this.state.currentMessage}
-                                    onChange={this.handleMessageChange}
-                                    className='form-control'
-                                    id='msg'
-                                    placeholder='Your message...'
-                                    ref={this.handleMessageRef} />
-                            <InputGroup.Button><Button type='submit' className='chat-button'>Send</Button></InputGroup.Button>
-                        </InputGroup>
-                    </Form>
-                </Panel.Footer>
-            </Panel>
-        )
-    }
+	render() {
+		const messages =
+			this.state.messages.length === 0 ? (
+				<p>Loading...</p>
+			) : (
+				this.state.messages.map(message => {
+					let cssclass =
+						message.sender === this.props.user.name ? 'self' : 'other';
+					return (
+						<li className={cssclass} key={message.id}>
+							<div className="msg">
+								<div className="user">{message.sender}</div>
+								<p>{message.message}</p>
+								<time>{moment(message.date).format('HH:mm:ss')}</time>
+							</div>
+						</li>
+					);
+				})
+			);
+		return (
+			<Panel>
+				<div id="scroll" className="panel-body chat-container" ref={this.panel}>
+					<ol className="chat">{messages}</ol>
+				</div>
+				<InputField chatService={this.chatService} />
+			</Panel>
+		);
+	}
 }

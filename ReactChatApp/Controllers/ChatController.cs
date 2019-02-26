@@ -11,24 +11,22 @@ namespace ReactChat.Controllers
     public class ChatController : Controller
     {
         private readonly IChatService _chatService;
-        public ChatController(IChatService chatService)
+        private readonly IUserTracker _userService;
+        public ChatController(IChatService chatService, IUserTracker userService)
         {
             _chatService = chatService;
+            _userService = userService;
         }
         [HttpGet("[action]")]
-        public IEnumerable<User> LoggedOnUsers()
+        public async Task<IEnumerable<User>> LoggedOnUsers()
         {
-            return new[]{
-            new User { Id = 1, Name = "Joe" },
-            new User { Id = 3, Name = "Mary" },
-            new User { Id = 2, Name = "Pete" },
-            new User { Id = 4, Name = "Mo" } };
+            return await _userService.GetOnlineUsers();
         }
 
         [HttpGet("[action]")]
-        public IEnumerable<ChatMessage> InitialMessages()
+        public async Task<IEnumerable<ChatMessage>> InitialMessages()
         {
-            return _chatService.GetAllInitially();
+            return await _chatService.GetAllInitially();
         }
     }
 }

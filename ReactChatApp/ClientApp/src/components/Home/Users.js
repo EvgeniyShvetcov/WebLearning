@@ -1,54 +1,71 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
 import { Panel } from 'react-bootstrap';
 import UsersServices from '../../services/UsersService';
+import WebsocketService from '../../services/WebsocketService';
+import './Users.css';
 
 export class Users extends React.Component {
-    constructor(props) {
-        super(props);
+	constructor(props) {
+		super(props);
 
-        this.state = {
-            users: []
-        };
-        this.setUsersList = this.setUsersList.bind(this);
-        this.onUserLoginOn = this.onUserLoginOn.bind(this);
+		this.state = {
+			users: [],
+		};
+		this.setUsersList = this.setUsersList.bind(this);
+		this.onUserLoginOn = this.onUserLoginOn.bind(this);
+		this.onUserLoginOut = this.onUserLoginOut.bind(this);
 
-        this.usersService = new UsersServices(this.onUserLoginOn);
-        this.usersService.fetchOnlineUsersList(this.setUsersList);
-    }
+		this.usersService = new UsersServices(
+			WebsocketService.instance,
+			this.onUserLoginOn,
+			this.onUserLoginOut
+		);
+	}
 
-    onUserLoginOn(id, name){
-        const users = this.state.users;
-        users.push({id, name});
-        this.setState({
-            users: users
-        });
-    }
+	componentDidMount() {
+		this.usersService.fetchOnlineUsersList(this.setUsersList);
+	}
 
-    setUsersList(usersList){
-        this.setState({
-            users: usersList
-        })
-    }
+	onUserLoginOn(user) {
+		this.setState({
+			users: [...this.state.users, user],
+		});
+	}
 
-    render() {
-        const users = this.state.users.length === 0 ? <p>Loading...</p>: this.state.users.map((user) => {
-            return <li key={user.id}>{user.name}</li>
-        })
-        return (
-            <div>
-                <Panel>
-                    <Panel.Heading>
-                        <Panel.Title componentClass="h3">Users Online: </Panel.Title>
-                    </Panel.Heading>
-                    <Panel.Body>
-                        <ul className='chat-users'>
-                            {users}
-                        </ul>
-                    </Panel.Body>
-                </Panel>
-            </div>
-        );
-    }
+	onUserLoginOut(user) {
+		this.setState({
+			users: this.state.users.filter(item => item.id !== user.id),
+		});
+	}
+
+	setUsersList(usersList = []) {
+		this.setState({
+			users: [...usersList],
+		});
+	}
+
+	renderUsers() {
+		return this.state.users.length === 0 ? (
+			<p>Loading...</p>
+		) : (
+			this.state.users.map(user => {
+				return <li key={user.id}>{user.name}</li>;
+			})
+		);
+	}
+
+	render() {
+		return (
+			<Panel>
+				<Panel.Heading>
+					<Panel.Title componentClass="h3">Users Online: </Panel.Title>
+				</Panel.Heading>
+				<Panel.Body>
+					<ul className="online-users">{this.renderUsers()}</ul>
+				</Panel.Body>
+			</Panel>
+		);
+	}
 }
 
 //Users.propTypes = {UserState: React.PropTypes.array};

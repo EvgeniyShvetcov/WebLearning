@@ -1,6 +1,11 @@
-@media (max-width: 767px) {
-    /* On small screens, the nav menu spans the full width of the screen. Leave a space for it. */
-    body {
-        padding-top: 50px;
-    }
+html, body {
+    background: #252C33;
+    color: #c2c2c2;
+    font-family: 'Lato', sans-serif;
+    margin: 0px auto;
+}
+
+::selection{
+  background: rgba(82,179,217,0.3);
+  color: inherit;
 }
