@@ -10,11 +10,12 @@ export default class ChatService {
 		if (this._websocketService) this._websocketService.sendMessage(message);
 	}
 
-	fetchMessagesList(setMessagesList) {
-		fetch('http://localhost:5000/api/Chat/InitialMessages')
-			.then(response => {
-				if (response.ok) return response.json();
-			})
-			.then(data => setMessagesList(data));
+	async fetchMessagesList(messagesCount, messagesOffset) {
+		let requestUrl = new URL('http://localhost:5000/api/Chat/InitialMessages');
+		let params = new URLSearchParams({ messagesCount, messagesOffset });
+		requestUrl.search = params;
+		return fetch(requestUrl).then(response => {
+			if (response.ok) return response.json();
+		});
 	}
 }

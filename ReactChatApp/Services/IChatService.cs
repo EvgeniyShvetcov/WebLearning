@@ -6,7 +6,7 @@ namespace ReactChatApp.Services
 {
     public interface IChatService
     {
-        Task<IEnumerable<ChatMessage>> GetAllInitially();
+        Task<MessagesPack> GetMessagesList(int messagesCount, int messagesOffset);
         ChatMessage CreateNewMessage(string senderName, string message);
         bool AddNewMessage(ChatMessage message);
     }

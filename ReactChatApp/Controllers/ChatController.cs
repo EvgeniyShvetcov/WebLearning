@@ -24,9 +24,9 @@ namespace ReactChat.Controllers
         }
 
         [HttpGet("[action]")]
-        public async Task<IEnumerable<ChatMessage>> InitialMessages()
+        public async Task<MessagesPack> InitialMessages(int messagesCount, int messagesOffset)
         {
-            return await _chatService.GetAllInitially();
+            return await _chatService.GetMessagesList(messagesCount, messagesOffset);
         }
     }
 }

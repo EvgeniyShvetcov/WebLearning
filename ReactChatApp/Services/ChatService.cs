@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ReactChatApp.Data;
 using ReactChatApp.Models;
@@ -34,19 +35,25 @@ namespace ReactChatApp.Services
             _context.SaveChanges();
             return true;
         }
-        public Task<IEnumerable<ChatMessage>> GetAllInitially()
+        public Task<MessagesPack> GetMessagesList(int messagesCount, int messagesOffset)
         {
             var countOfAllMessages = _context.Messages.Count();
-            //Take last 10 messages from DB.
+            var skippedMessages = countOfAllMessages - (messagesOffset + messagesCount);
+            if (skippedMessages < 0)
+            {
+                messagesCount = skippedMessages + messagesCount;
+                skippedMessages = 0;
+            }
             //Next: calculate count of initial messages for
             //different screen sizes.
-            var countOfReceivedMessages = 10;
             var messages = _context.Messages
                 .AsNoTracking()
-                .Skip(countOfAllMessages - countOfReceivedMessages)
+                .Skip(skippedMessages)
+                .Take(messagesCount)
                 .AsEnumerable();
 
-            return Task.FromResult(messages);
+
+            return Task.FromResult(new MessagesPack { CountOfAllMessages = countOfAllMessages, Messages = messages });
         }
     }
 }

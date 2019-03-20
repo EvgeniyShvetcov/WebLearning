@@ -41,7 +41,9 @@ class WebsocketService {
 	}
 
 	sendMessage(message) {
-		this._connection.invoke('AddMessage', message);
+		this._connection
+			.invoke('AddMessage', message)
+			.catch(err => console.error(err, 'red'));
 	}
 
 	registerMessageAdded(messageAddedCallback) {
@@ -52,7 +54,6 @@ class WebsocketService {
 
 	registerUserLoginOn(userLoginOnCallback) {
 		this._connection.on('UserLoggedOn', user => {
-			console.log('UserloggedIn');
 			userLoginOnCallback(user);
 		});
 	}

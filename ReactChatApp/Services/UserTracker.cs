@@ -17,14 +17,7 @@ namespace ReactChatApp.Services
 
         public UserTracker()
         {
-            _joinedUsersList = new List<User>()
-            {
-                new User { Id = "1" , Name = "Mo" },
-                new User { Id = "2" , Name = "Pete" },
-                new User { Id = "3" , Name = "Joe" },
-                new User { Id = "4" , Name = "Mary" }
-            };
-
+            _joinedUsersList = new List<User>();
         }
 
         public User AddUser(string sid, string userName)

@@ -21,6 +21,9 @@ export class Chat extends React.Component {
 		);
 
 		this.panel = React.createRef();
+		this.messagesOffset = 0;
+		this.isLoading = false;
+		this.allMessagesCount = undefined;
 
 		this.scrollDown = () => {
 			if (this.panel.current)
@@ -29,7 +32,12 @@ export class Chat extends React.Component {
 	}
 
 	componentDidMount() {
-		this.chatService.fetchMessagesList(this.setMessagesList);
+		this.chatService
+			.fetchMessagesList(10, this.messagesOffset)
+			.then(responseData => {
+				this.setMessagesList(responseData.messages);
+				this.messagesOffset += 10;
+			});
 	}
 
 	addMessage(newMessage) {
@@ -48,6 +56,36 @@ export class Chat extends React.Component {
 		});
 
 		this.scrollDown();
+	}
+
+	onScrollHandler() {
+		if (this.isLoading) return;
+		const panelTopHeight = this.panel.current.scrollTop;
+
+		if (panelTopHeight < 100) {
+			if (
+				this.allMessagesCount === undefined ||
+				(this.allMessagesCount > 0 &&
+					this.messagesOffset < this.allMessagesCount)
+			) {
+				this.isLoading = true;
+				this.chatService
+					.fetchMessagesList(10, this.messagesOffset)
+					.then(responseData => {
+						this.allMessagesCount = responseData.countOfAllMessages;
+						let receivedMessagesCount = responseData.messages.length;
+						this.setState({
+							messages: [...responseData.messages, ...this.state.messages],
+						});
+						this.messagesOffset += 10;
+						this.isLoading = false;
+					})
+					.catch(err => {
+						this.isLoading = false;
+						console.error(err);
+					});
+			}
+		}
 	}
 
 	render() {
@@ -71,7 +109,12 @@ export class Chat extends React.Component {
 			);
 		return (
 			<Panel>
-				<div id="scroll" className="panel-body chat-container" ref={this.panel}>
+				<div
+					id="scroll"
+					onScroll={() => this.onScrollHandler()}
+					className="panel-body chat-container"
+					ref={this.panel}
+				>
 					<ol className="chat">{messages}</ol>
 				</div>
 				<InputField chatService={this.chatService} />
