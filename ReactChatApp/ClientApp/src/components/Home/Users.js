@@ -27,15 +27,19 @@ export class Users extends React.Component {
 	}
 
 	onUserLoginOn(user) {
-		this.setState({
-			users: [...this.state.users, user],
-		});
+		if (user !== null) {
+			this.setState({
+				users: [...this.state.users, user],
+			});
+		}
 	}
 
 	onUserLoginOut(user) {
-		this.setState({
-			users: this.state.users.filter(item => item.id !== user.id),
-		});
+		if (user !== null) {
+			this.setState({
+				users: this.state.users.filter(item => item.id !== user.id),
+			});
+		}
 	}
 
 	setUsersList(usersList = []) {
@@ -67,5 +71,3 @@ export class Users extends React.Component {
 		);
 	}
 }
-
-//Users.propTypes = {UserState: React.PropTypes.array};

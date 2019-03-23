@@ -16,8 +16,7 @@ class Authenticate extends Component {
 		super(props);
 		this.signin = this.signin.bind(this);
 		this.onUserLoaded = this.onUserLoaded.bind(this);
-
-		this.state = { isAuthenticated: false };
+		this.onUserUnloaded = this.onUserUnloaded.bind(this);
 	}
 
 	componentWillMount() {
@@ -42,15 +41,11 @@ class Authenticate extends Component {
 	}
 
 	onUserLoaded(user) {
-		this.setState({ isAuthenticated: true }, () => {
-			if (this.props.userLoaded !== undefined) this.props.userLoaded(user);
-		});
+		if (this.props.LoginAction !== undefined) this.props.LoginAction(user);
 	}
 
 	onUserUnloaded() {
-		this.setState({ isAuthenticated: false }, () => {
-			if (this.props.userUnLoaded !== undefined) this.props.userUnLoaded();
-		});
+		if (this.props.LogoutAction !== undefined) this.props.LogoutAction();
 	}
 
 	signin() {
@@ -65,7 +60,7 @@ class Authenticate extends Component {
 	}
 
 	render() {
-		if (this.state.isAuthenticated) {
+		if (this.props.isAuthenticated) {
 			return this.props.children;
 		}
 		return (
@@ -109,13 +104,13 @@ Authenticate.propTypes = {
 		scope: propTypes.string.isRequired,
 	}).isRequired,
 	/**
-	 * @property {func} userLoaded Raised when a user session has been established (or re-established), accepts one parameter 'user'.
+	 * @property {func} LoginAction Redux action used when user is logged in
 	 */
-	userLoaded: propTypes.func,
+	LoginAction: propTypes.func.isRequired,
 	/**
-	 * @property {func} userUnLoaded Raised when a user session has been terminated.
+	 * @property {func} LogoutAction Redux action used when user is logged out
 	 */
-	userUnLoaded: propTypes.func,
+	LogoutAction: propTypes.func.isRequired,
 	/**
 	 * @property {func} renderNotAuthenticated Renderprop used to render output when user is not authenticated
 	 */
