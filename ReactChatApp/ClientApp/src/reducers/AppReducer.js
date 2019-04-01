@@ -6,7 +6,7 @@ const initialState = {
 	error: '',
 };
 
-export function AppReducer(state = initialState, action) {
+export default function AppReducer(state = initialState, action) {
 	switch (action.type) {
 		case AppActions.LOGIN_USER:
 			return {
@@ -21,7 +21,7 @@ export function AppReducer(state = initialState, action) {
 				error: action.payload.message,
 			};
 		case AppActions.LOGOUT:
-			return { ...state, user: undefined };
+			return { ...state, isAuthenticated: false, user: undefined };
 		default:
 			return state;
 	}
