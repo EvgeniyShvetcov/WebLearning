@@ -7,8 +7,6 @@ import { Counter } from './Counter';
 import Authenticate from './Authenticate';
 import configuration from '../configuration/configurations';
 import WebsocketService from '../services/WebsocketService';
-import { Chat } from './Home/Chat';
-
 export default class App extends Component {
 	constructor(props) {
 		super(props);
@@ -30,15 +28,10 @@ export default class App extends Component {
 		);
 	}
 
-	isAuthenticated = user => {
-		this.connectToService(user);
+	isAuthenticated = () => {
 		return (
 			<Layout>
-				<Route
-					exact
-					path="/"
-					render={() => <Home chat={<Chat user={user.profile} />} />}
-				/>
+				<Route exact path="/" component={Home} />
 				<Route path="/counter" component={Counter} />
 				<Route path="/fetchdata" component={FetchData} />
 			</Layout>
@@ -56,7 +49,7 @@ export default class App extends Component {
 				LogoutAction={LogoutAction}
 				renderNotAuthenticated={this.notAuthenticated}
 			>
-				{this.isAuthenticated(user)}
+				{this.isAuthenticated()}
 			</Authenticate>
 		);
 	}

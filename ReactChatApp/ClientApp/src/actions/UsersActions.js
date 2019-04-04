@@ -10,10 +10,10 @@ export function GetConnectedUsers(apiPath, queryParams) {
 	return dispatch => {
 		dispatch({ type: UsersActions.GET_CONNECTED_USERS_REQUEST });
 
-		if (apiPath === null || apiPath.length === 0) return;
+		if (apiPath == null || apiPath.length === 0) return;
 		const queryPath = new URL(apiPath);
 		const params = new URLSearchParams({ ...queryParams });
-		queryPath.searchParams = params;
+		queryPath.search = params;
 
 		fetch(queryPath)
 			.then(response => {

@@ -1,29 +1,15 @@
 import React from 'react';
 import { Panel } from 'react-bootstrap';
 import moment from 'moment';
-import ChatService from '../../services/ChatService';
-import WebsocketService from '../../services/WebsocketService';
 import InputField from './InputField';
 import './Chat.css';
 
 export class Chat extends React.Component {
 	constructor(props) {
 		super(props);
-		this.state = {
-			messages: [],
-		};
-		this.addMessage = this.addMessage.bind(this);
-
-		this.setMessagesList = this.setMessagesList.bind(this);
-		this.chatService = new ChatService(
-			WebsocketService.instance,
-			this.addMessage
-		);
 
 		this.panel = React.createRef();
-		this.messagesOffset = 0;
-		this.isLoading = false;
-		this.allMessagesCount = undefined;
+		this.renderMessagesList = this.renderMessagesList.bind(this);
 
 		this.scrollDown = () => {
 			if (this.panel.current)
@@ -32,81 +18,68 @@ export class Chat extends React.Component {
 	}
 
 	componentDidMount() {
-		this.chatService
-			.fetchMessagesList(10, this.messagesOffset)
-			.then(responseData => {
-				this.setMessagesList(responseData.messages);
-				this.messagesOffset += 10;
-			});
-	}
-
-	addMessage(newMessage) {
-		if (newMessage.length === 0) {
-			return;
-		}
-		this.setState({
-			messages: [...this.state.messages, newMessage],
-		});
+		const {
+			messages,
+			messagesOffset,
+			countOfAllMessages,
+			GetMessageHistoryAction,
+		} = this.props;
+		if (messages.length === 0 || messages.length !== countOfAllMessages)
+			//After first entering in the chat, load the last ten messages
+			GetMessageHistoryAction(
+				'http://localhost:5000/api/Chat/InitialMessages',
+				10,
+				messagesOffset
+			);
 		this.scrollDown();
 	}
 
-	setMessagesList(messagesList) {
-		this.setState({
-			messages: messagesList,
-		});
-
-		this.scrollDown();
+	componentDidUpdate(prevProps) {
+		const { messages, afterGettingHistory } = this.props;
+		if (messages.length > 10 && afterGettingHistory) return;
+		//If we get some messages, scroll down the chat window
+		if (prevProps.messages.length < messages.length) this.scrollDown();
 	}
 
 	onScrollHandler() {
-		if (this.isLoading) return;
 		const panelTopHeight = this.panel.current.scrollTop;
+		const { countOfAllMessages, messagesOffset, isFetching } = this.props;
+		//When we scroll up to the top of the window get more history message
+		if (panelTopHeight > 100) return;
+		if (
+			!isFetching &&
+			countOfAllMessages > 0 &&
+			messagesOffset < countOfAllMessages
+		) {
+			this.props.GetMessageHistoryAction(
+				'http://localhost:5000/api/Chat/InitialMessages',
+				10,
+				messagesOffset
+			);
+		}
+	}
 
-		if (panelTopHeight < 100) {
-			if (
-				this.allMessagesCount === undefined ||
-				(this.allMessagesCount > 0 &&
-					this.messagesOffset < this.allMessagesCount)
-			) {
-				this.isLoading = true;
-				this.chatService
-					.fetchMessagesList(10, this.messagesOffset)
-					.then(responseData => {
-						this.allMessagesCount = responseData.countOfAllMessages;
-						let receivedMessagesCount = responseData.messages.length;
-						this.setState({
-							messages: [...responseData.messages, ...this.state.messages],
-						});
-						this.messagesOffset += 10;
-						this.isLoading = false;
-					})
-					.catch(err => {
-						this.isLoading = false;
-						console.error(err);
-					});
-			}
+	renderMessagesList() {
+		if (this.props.error) return <p>{this.props.error}</p>;
+		if (!this.props.afterGettingHistory && this.props.isFetching) {
+			return <p className="loader">Loading...</p>;
+		} else {
+			const messages = this.props.messages.map(message => {
+				return (
+					<li className={message.messageType} key={message.id}>
+						<div className="msg">
+							<div className="user">{message.sender}</div>
+							<p>{message.message}</p>
+							<time>{moment(message.date).format('HH:mm:ss')}</time>
+						</div>
+					</li>
+				);
+			});
+			return <ol className="chat">{messages}</ol>;
 		}
 	}
 
 	render() {
-		const messages =
-			this.state.messages.length === 0 ? (
-				<p>Loading...</p>
-			) : (
-				this.state.messages.map(message => {
-					let cssclass =
-						message.sender === this.props.user.name ? 'self' : 'other';
-					return (
-						<li className={cssclass} key={message.id}>
-							<div className="msg">
-								<div className="user">{message.sender}</div>
-								<p>{message.message}</p>
-								<time>{moment(message.date).format('HH:mm:ss')}</time>
-							</div>
-						</li>
-					);
-				})
-			);
 		return (
 			<Panel>
 				<div
@@ -115,7 +88,7 @@ export class Chat extends React.Component {
 					className="panel-body chat-container"
 					ref={this.panel}
 				>
-					<ol className="chat">{messages}</ol>
+					{this.renderMessagesList()}
 				</div>
 				<InputField chatService={this.chatService} />
 			</Panel>
