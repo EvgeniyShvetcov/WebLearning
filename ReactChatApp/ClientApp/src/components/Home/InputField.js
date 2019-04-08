@@ -29,7 +29,8 @@ export default class InputField extends Component {
 
 	onSubmit(event) {
 		event.preventDefault();
-		this.props.chatService.sendMessage(this.state.currentMessage);
+		if (this.props.sendMessage !== undefined)
+			this.props.sendMessage(this.state.currentMessage);
 		this.setState({ currentMessage: '' });
 	}
 

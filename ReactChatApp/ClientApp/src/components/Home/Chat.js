@@ -90,7 +90,7 @@ export class Chat extends React.Component {
 				>
 					{this.renderMessagesList()}
 				</div>
-				<InputField chatService={this.chatService} />
+				<InputField sendMessage={this.props.SendMessageAction} />
 			</Panel>
 		);
 	}

@@ -12,7 +12,7 @@ const injectMessageType = store => {
 	const user = store.app.user;
 	const messages = store.chat.messages;
 	return messages.map(message => {
-		if (message.sender === null) return message;
+		if (message.sender === undefined) return message;
 		const messageType =
 			message.sender === user.profile.name
 				? MessageType.OwnMessage

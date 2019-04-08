@@ -13,6 +13,13 @@ export function SendMessage(message) {
 	};
 }
 
+export function MessageReceivedAction(message) {
+	return {
+		type: ChatActions.MESSAGE_RECEIVED,
+		payload: message,
+	};
+}
+
 export function GetMessageHistory(apiPath, messagesCount, messagesOffset) {
 	return dispatch => {
 		dispatch({ type: ChatActions.GET_MESSAGE_HISTORY_REQUEST });

@@ -21,7 +21,10 @@ class WebsocketService {
 	}
 
 	get isConnected() {
-		return this._connection != null;
+		return (
+			this._connection !== null &&
+			this._connection.connectionState === SignalR.HubConnectionState.Connected
+		);
 	}
 
 	init(connectionString, access_token) {
@@ -37,30 +40,30 @@ class WebsocketService {
 			.configureLogging(SignalR.LogLevel.Information)
 			.build();
 
-		this._connection.start().catch(err => console.error(err, 'red'));
+		return this._connection.start();
 	}
 
 	sendMessage(message) {
 		this._connection
-			.invoke('AddMessage', message)
+			.invoke('SendMessage', message)
 			.catch(err => console.error(err, 'red'));
 	}
 
-	registerMessageAdded(messageAddedCallback) {
-		this._connection.on('MessageAdded', message => {
-			messageAddedCallback(message);
+	registerMessageReceiveAction(messageReceivedCallback) {
+		this._connection.on('ReceiveMessage', message => {
+			messageReceivedCallback(message);
 		});
 	}
 
-	registerUserLoginOn(userLoginOnCallback) {
-		this._connection.on('UserLoggedOn', user => {
-			userLoginOnCallback(user);
+	registerUserLoginAction(userLoginCallback) {
+		this._connection.on('UserLoggedIn', user => {
+			userLoginCallback(user);
 		});
 	}
 
-	registerUserLoginOut(userLoginOutCallback) {
+	registerUserLogoutAction(userLogoutCallback) {
 		this._connection.on('UserLoggedOut', user => {
-			userLoginOutCallback(user);
+			userLogoutCallback(user);
 		});
 	}
 }

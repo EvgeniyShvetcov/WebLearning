@@ -38,3 +38,17 @@ export function GetConnectedUsers(apiPath, queryParams) {
 			});
 	};
 }
+
+export function UserConnectedAction(user) {
+	return {
+		type: UsersActions.USER_CONNECTED,
+		payload: user,
+	};
+}
+
+export function UserDisconnectedAction(user) {
+	return {
+		type: UsersActions.USER_DISCONNECTED,
+		payload: user,
+	};
+}

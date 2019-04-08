@@ -3,6 +3,7 @@ import reduxThunk from 'redux-thunk';
 import AppReducer from '../reducers/AppReducer';
 import UsersReducer from '../reducers/UsersReducer';
 import ChatReducer from '../reducers/ChatReducer';
+import websocketServiceMiddleware from '../middlewares/websocketServiceMiddleware';
 
 const rootReducer = combineReducers({
 	app: AppReducer,
@@ -13,7 +14,7 @@ const rootReducer = combineReducers({
 const store = createStore(
 	rootReducer,
 	compose(
-		applyMiddleware(reduxThunk),
+		applyMiddleware(reduxThunk, websocketServiceMiddleware),
 		window.__REDUX_DEVTOOLS_EXTENSION__
 			? window.__REDUX_DEVTOOLS_EXTENSION__()
 			: f => f

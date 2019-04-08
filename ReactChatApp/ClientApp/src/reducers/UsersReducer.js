@@ -15,7 +15,7 @@ export default function UsersReducer(state = initialState, action) {
 		case UsersActions.GET_CONNECTED_USERS_FAIL:
 			return { ...state, error: action.payload.message };
 		case UsersActions.USER_CONNECTED:
-			return { ...state, users: action.payload };
+			return { ...state, users: [...state.users, action.payload] };
 		case UsersActions.USER_DISCONNECTED:
 			return {
 				...state,
