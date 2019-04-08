@@ -18,12 +18,12 @@ namespace ReactChatApp.Hubs
             _chatService = chatService;
             _userService = userService;
         }
-        public void AddMessage(string message)
+        public void SendMessage(string message)
         {
             var name = Context.User?.Identity?.Name;
             var chatMessage = _chatService.CreateNewMessage(name, message);
-            // Call the MessageAdded method on the clients side.
-            Clients.All.SendAsync("MessageAdded", chatMessage);
+            // Call the ReceiveMessage method on the clients side.
+            Clients.All.SendAsync("ReceiveMessage", chatMessage);
         }
 
         public override Task OnConnectedAsync()
@@ -31,7 +31,7 @@ namespace ReactChatApp.Hubs
             var name = Context.User?.Identity?.Name;
             var sessionId = Context.User?.FindFirstValue("sid");
             var user = _userService.AddUser(sessionId, name);
-            Clients.All.SendAsync("UserLoggedOn", user);
+            Clients.Others.SendAsync("UserLoggedIn", user);
             return base.OnConnectedAsync();
         }
 
